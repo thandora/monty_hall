@@ -1,7 +1,7 @@
 #Monty Hall - Generalized
 
 #1 Show and open all doorsx
-#2 Shuffle doorsx
+#2 Shuffle doors
 #3 Ask player to choose doorx
 #4 From unchosen doors, open half of non-winning doors 
 #5 Ask player to stay or switch
@@ -100,15 +100,16 @@ for _ in range(n_doors - 1):
 else:
     doors.append(winner_element)
     random.shuffle(doors)
-winner_index = doors.index(winner_element)
-print(doors) #Test case
-
-
 
 #1 Show all doors
+list_printer(doors, range(n_doors))
+
+#2 Shuffle doors
+print("Shuffling doors...")
+random.shuffle(doors)
+winner_index = doors.index(winner_element)
 list_printer(doors)
-#Shuffle doors
-# random.shuffle(doors) ##############################
+
 
 #3 Ask player to choose a door
 user_door_choice = None
@@ -124,8 +125,6 @@ user_door_choice -= 1 #Translate to python index
 #4 From unchosen doors, open half of non-winning doors 
 losers = gen_losers(doors, 1)
 decoys = gen_decoys(doors, losers, user_door_choice, 1)
-
-
 print(f"You chose door number {user_door_choice + 1}. Opening some doors...")
 list_printer(doors, decoys)
 print_indicator(doors, user_door_choice)
@@ -133,7 +132,6 @@ print_indicator(doors, user_door_choice)
 #6 Let player choose to switch or stay.
 unopened_doors = set(range(len(doors))) - set(decoys) - set([user_door_choice])
 
-# print(f"Unopened doors: {unopened_doors}")
 switch_choice = ""
 while switch_choice not in ["s", "w"]:
     try:
