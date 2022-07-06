@@ -93,7 +93,7 @@ def print_indicator(l: list, position: int):
 #Initialize initial parameters.
 loser_element = 0
 winner_element = 1
-n_doors = 5
+n_doors = 3
 doors = []
 for _ in range(n_doors - 1):
     doors.append(loser_element)
@@ -101,70 +101,38 @@ else:
     doors.append(winner_element)
     random.shuffle(doors)
 winner_index = doors.index(winner_element)
-print(doors) #Test case
+# print(doors) #Test case
 
 
-
-#1 Show all doors
-list_printer(doors)
-#Shuffle doors
-# random.shuffle(doors) ##############################
-
-#3 Ask player to choose a door
-user_door_choice = None
-while user_door_choice not in range(1, n_doors + 1):
-    try:
-        user_door_choice = int(input("Choose a door number: "))
-    except:
-        print(f"Input must be a number! (1 to {n_doors})")
-
-print(f"\n\nYou chose door {user_door_choice}")
-user_door_choice -= 1 #Translate to python index
-
-#4 From unchosen doors, open half of non-winning doors 
-losers = gen_losers(doors, 1)
-decoys = gen_decoys(doors, losers, user_door_choice, 1)
+n_tests = 10000
+current_test = 0
+switch_choice = "s" #(s or w)
+wins = 0
+loses = 0
+for _ in range(n_tests):
 
 
-print(f"You chose door number {user_door_choice + 1}. Opening some doors...")
-list_printer(doors, decoys)
-print_indicator(doors, user_door_choice)
+    #Randomly choose a door
+    user_door_choice = random.choice(range(n_doors))
 
-#6 Let player choose to switch or stay.
-unopened_doors = set(range(len(doors))) - set(decoys) - set([user_door_choice])
+    #Make unopened doors list.
+    losers = gen_losers(doors, 1)
+    decoys = gen_decoys(doors, losers, user_door_choice, 1)
+    unopened_doors = set(range(len(doors))) - set(decoys) - set([user_door_choice])
 
-# print(f"Unopened doors: {unopened_doors}")
-switch_choice = ""
-while switch_choice not in ["s", "w"]:
-    try:
-        switch_choice = input(f"Stay or switch door? (S / W): ").lower()
-    except:
-        print("Input valid choice! S to stay or choose a door number")
+    #Choose to switch or stay.
+    if switch_choice == "w":
+        #Randomly choose from 1 of the unopened doors.
+        user_door_choice = random.choice(list(unopened_doors))
 
-#Format unopened_doors for UX
-f_unopened_doors = []
-for element in unopened_doors:
-    f_unopened_doors.append(element + 1)
-    #Learn list comprehension lul
-
-if switch_choice == "w":
-    user_door_choice = ""
-    while user_door_choice not in f_unopened_doors:
-        try:
-            user_door_choice = int(input(f"Choose an unopened door number {f_unopened_doors}: "))
-        except:
-            print("Enter a valid door number.")
-
-    user_door_choice -= 1 #Convert to index form
-    
-list_printer(doors, range(len(doors)))
-print_indicator(doors, user_door_choice)
-
-if user_door_choice == winner_index:
-    print(f"You found the car! You win")
-else:
-    print(f"You found a cow, you lose. :(")
+    #Log
+    if user_door_choice == winner_index:
+        wins += 1
+    else:
+        loses += 1
 
 
-
+print(f"wins: {wins}")
+print(f"loses: {loses}")
+print(f"Win rate: {wins / (wins+loses)}")
 #TODO let print_indicator() dynamically resize according to elements in list.
