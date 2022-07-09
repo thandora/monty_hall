@@ -131,7 +131,10 @@ for _ in range(n_tests):
     else:
         loses += 1
 
-
+if switch_choice == "w":
+    print(f"You chose to switch")
+else:
+    print(f"You chose to stay.")
 print(f"wins: {wins}")
 print(f"loses: {loses}")
 print(f"Win rate: {wins / (wins+loses)}")
