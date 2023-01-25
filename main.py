@@ -1,11 +1,10 @@
-#Monty Hall - Generalized
-
-#1 Show and open all doorsx
-#2 Shuffle doorsx
-#3 Ask player to choose doorx
-#4 From unchosen doors, open half of non-winning doors 
-#5 Ask player to stay or switch
-#6 Revaeal all
+# Monty Hall Problem - Simulation of n runs
+# 1 Show and open all doors
+# 2 Shuffle doors
+# 3 Ask player to choose door
+# 4 From unchosen doors, open all non-winner doors but one.
+# 5 Ask player to stay or switch
+# 6 Reveal all
 
 import random
 
@@ -66,7 +65,7 @@ def list_printer(l: list, shown_index = -1):
         else:
             print(" ]")
 
-    #Shown_index == -1 (Expose nothing)       
+    # Shown_index == -1 (Expose nothing)       
     else:
         print("[ ", end="")
         for i, _ in enumerate(l):
@@ -90,10 +89,10 @@ def print_indicator(l: list, position: int):
             print("     ", end="")
     print("")
 
-#Initialize initial parameters.
+# Initialize initial parameters.
 loser_element = 0
 winner_element = 1
-n_doors = 3
+n_doors = 10
 doors = []
 for _ in range(n_doors - 1):
     doors.append(loser_element)
@@ -101,31 +100,30 @@ else:
     doors.append(winner_element)
     random.shuffle(doors)
 winner_index = doors.index(winner_element)
-# print(doors) #Test case
 
-
-n_tests = 10000
+n_tests = 1
 current_test = 0
-switch_choice = "s" #(s or w)
+switch_choice = "w" # s for stay, w for switch
 wins = 0
 loses = 0
 for _ in range(n_tests):
 
 
-    #Randomly choose a door
+    # Randomly choose a door
     user_door_choice = random.choice(range(n_doors))
 
-    #Make unopened doors list.
+    # Make unopened doors list.
     losers = gen_losers(doors, 1)
     decoys = gen_decoys(doors, losers, user_door_choice, 1)
     unopened_doors = set(range(len(doors))) - set(decoys) - set([user_door_choice])
 
-    #Choose to switch or stay.
+    # Choose to switch or stay.
     if switch_choice == "w":
-        #Randomly choose from 1 of the unopened doors.
+        # Randomly choose from 1 of the unopened doors.
         user_door_choice = random.choice(list(unopened_doors))
 
-    #Log
+    list_printer(unopened_doors)
+    # Log
     if user_door_choice == winner_index:
         wins += 1
     else:
@@ -138,4 +136,3 @@ else:
 print(f"wins: {wins}")
 print(f"loses: {loses}")
 print(f"Win rate: {wins / (wins+loses)}")
-#TODO let print_indicator() dynamically resize according to elements in list.
