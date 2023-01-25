@@ -1,29 +1,30 @@
-# Monty Hall Problem - Simulation of n runs
-# 1 Show and open all doors
-# 2 Shuffle doors
-# 3 Ask player to choose door
-# 4 From unchosen doors, open all non-winner doors but one.
-# 5 Ask player to stay or switch
-# 6 Reveal all
+# Monty Hall Problem - Simulation of n trials
+# Change control variables to vary tests.
+# Default monty hall problem:
+# N_TO_OPEN = 1
+# N_DOORS = 3
 
 import random
 
-def gen_losers(l: list, winner):
+
+def gen_losers(losers_list: list, winner):
     """
-    Returns a list of indices of losers. Losers are considered 
+    Returns a list of indices of losers. Losers are considered
     those that are not <winner>
     """
     losers = []
-    for i, x  in enumerate(l):
+    for i, x in enumerate(losers_list):
         if x != winner:
             losers.append(i)
 
     return losers
 
+
 def gen_decoys(all_choices, losers, choice_index, winner, n: int = -1):
     """
     Returns a list of indices of decoys. Decoys are those that are not
-    user choice indicated by <choice_index>, and not the winner.
+    user choice indicated by <choice_index>, and not the winner. n set to
+    -1 is default, and will return half of the number of losers, rounded down.
     """
     if n == -1:
         n = len(losers) // 2
@@ -42,7 +43,8 @@ def gen_decoys(all_choices, losers, choice_index, winner, n: int = -1):
     decoys = random.sample(decoys, k=n)
     return decoys
 
-def list_printer(l: list, shown_index = -1):
+
+def list_printer(list_to_print: list, shown_index=-1):
     """
     Print formatted list. Indices in <shown_index> will be exposed.
     <shown_index> can be an integer, or a list of indices.
@@ -55,30 +57,30 @@ def list_printer(l: list, shown_index = -1):
 
     if shown_index != -1:
         print("[ ", end="")
-        for i, _ in enumerate(l):
+        for i, _ in enumerate(list_to_print):
             if i in shown_index:
-                print(f"[{l[i]}]", end="")
+                print(f"[{list_to_print[i]}]", end="")
             else:
-                print(f"[?]", end="")
-            if i != (len(l) - 1):
+                print("[?]", end="")
+            if i != (len(list_to_print) - 1):
                 print(", ", end="")
         else:
             print(" ]")
 
-    # Shown_index == -1 (Expose nothing)       
+    # Shown_index == -1 (Expose nothing)
     else:
         print("[ ", end="")
-        for i, _ in enumerate(l):
-            print(f"[?]", end="")
-            if i != (len(l) - 1):
+        for i, _ in enumerate(list_to_print):
+            print("[?]", end="")
+            if i != (len(list_to_print) - 1):
                 print(", ", end="")
         else:
             print(" ]")
 
-def print_indicator(l: list, position: int):
+
+def print_indicator(list_to_format: list, position: int):
     n = 0
-    n_end = len(l)
-    for n, _ in enumerate(l):
+    for n, _ in enumerate(list_to_format):
         if n == 0:
             print("   ", end="")
 
@@ -89,50 +91,61 @@ def print_indicator(l: list, position: int):
             print("     ", end="")
     print("")
 
+
+# CONTROL VARIABLES ###################################
+# Control variables.
+N_TESTS = 10000  # Number of trials
+# n_to_unopen represents how many doors are left
+# unopened when the host opens the decoy doors.
+N_TO_UNOPEN = 1  # Number of doors not to open. Default is 1
+N_DOORS = 10
+# s for stay, w for switch
+SWITCH_CHOICE = "w"
+#######################################################
+
 # Initialize initial parameters.
 loser_element = 0
 winner_element = 1
-n_doors = 10
 doors = []
-for _ in range(n_doors - 1):
+
+for _ in range(N_DOORS - 1):
     doors.append(loser_element)
 else:
     doors.append(winner_element)
     random.shuffle(doors)
 winner_index = doors.index(winner_element)
 
-n_tests = 1
-current_test = 0
-switch_choice = "w" # s for stay, w for switch
+losers = gen_losers(doors, winner_element)
+
 wins = 0
 loses = 0
-for _ in range(n_tests):
-
+for _ in range(N_TESTS):
 
     # Randomly choose a door
-    user_door_choice = random.choice(range(n_doors))
+    user_door_choice = random.choice(range(N_DOORS))
 
     # Make unopened doors list.
-    losers = gen_losers(doors, 1)
-    decoys = gen_decoys(doors, losers, user_door_choice, 1)
+    losers = gen_losers(doors, winner_element)
+    decoys = gen_decoys(doors, losers, user_door_choice, winner_element, len(losers) - N_TO_UNOPEN)
     unopened_doors = set(range(len(doors))) - set(decoys) - set([user_door_choice])
 
     # Choose to switch or stay.
-    if switch_choice == "w":
+    if SWITCH_CHOICE == "w":
         # Randomly choose from 1 of the unopened doors.
         user_door_choice = random.choice(list(unopened_doors))
 
-    list_printer(unopened_doors)
     # Log
     if user_door_choice == winner_index:
         wins += 1
     else:
         loses += 1
 
-if switch_choice == "w":
-    print(f"You chose to switch")
+if SWITCH_CHOICE == "w":
+    print("You chose to switch")
 else:
-    print(f"You chose to stay.")
+    print("You chose to stay.")
+
 print(f"wins: {wins}")
 print(f"loses: {loses}")
 print(f"Win rate: {wins / (wins+loses)}")
+print(f"Expected: {(N_DOORS - 1) / N_DOORS}")
